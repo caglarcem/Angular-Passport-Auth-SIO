@@ -1,0 +1,108 @@
+/*body {*/
+    /*font-family: arial;*/
+    /*margin: 0;*/
+/*}*/
+
+.demoTable {
+    float: left;
+    margin: 0;
+    vertical-align: top;
+    height: 70%;
+    width: 70%;
+    border-bottom: 1px solid black;
+}
+
+.demoDetailPane {
+    float: left;
+    border: 1px solid black;
+    margin: 0;
+    width: 20%;
+    height: 70%;
+    background-color: #87cefa;
+    vertical-align: top;
+}
+
+.demoDetailInnerPane {
+    padding: 5px;
+}
+
+.demoRow {
+    font-size: 16px;
+}
+
+.demoHeaderColumn {
+    background-color: #cccccc;
+    border-bottom: 0;
+}
+
+.demoFarRightHeaderColumn {
+    background-color: #cccccc;
+    border-bottom: 0;
+    border-right: 0;
+}
+
+.demoHeaderText {
+    display: inline-block;
+}
+
+.demoFarRightColumn {
+    border-right: 0;
+}
+
+.angularTableColumn {
+    padding: 5px;
+    border-bottom: 0;
+}
+
+
+[ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+    display: none;
+}
+
+body {
+    font-size: 1em;
+}
+
+#cover {
+    position:absolute;
+    height:100%;
+    width:100%;
+    background:white;
+}
+
+#userInfo {
+    float:right;padding:8px;
+}
+
+.icon-twitter {
+    color:#00A7E7;
+}
+
+.icon-facebook-sign {
+    color:#3662A0;
+}
+
+.icon-google-plus-sign {
+    color: #D74634;
+}
+
+.fade-hide-setup, .fade-show-setup {
+    -webkit-transition:all cubic-bezier(0.250, 0.460, 0.450, 0.940) 0.5s;
+    -moz-transition:all cubic-bezier(0.250, 0.460, 0.450, 0.940) 0.5s;
+    -o-transition:all cubic-bezier(0.250, 0.460, 0.450, 0.940) 0.5s;
+    transition:all cubic-bezier(0.250, 0.460, 0.450, 0.940) 0.5s;
+}
+
+.fade-hide-setup {
+    opacity:1;
+}
+.fade-hide-setup.fade-hide-start {
+    opacity:0;
+}
+
+.fade-show-setup {
+    opacity:0;
+}
+.fade-show-setup.fade-show-start {
+    opacity:1;
+}

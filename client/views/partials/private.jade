@@ -1,0 +1,24 @@
+h1 Private view
+p This is the partial for private view on socket.
+p The current time is {{time}}
+p
+h2 Hello part2 {{name2}} --  {{name}}  --  {{name3}}  --  {{namet}}
+   // input(ng-model='form.dolStart',style="margin-top:1px;width=25px",ui-date-format ui-date="dateOptions"  )
+p
+p
+p
+
+hr
+p This view is visible to logged in users
+  | select ADJUSTER_ID, ADJUSTER_NAME, ADJUSTER_PHONE, ADJUSTER_EXT, "Email"    from ADJUSTER
+table.table.table-striped(data-ng-hide="loading")
+    thead
+        tr
+            th #
+            th ADJUSTER_NAME
+            th ADJUSTER_PHONE
+    tbody
+        tr(data-ng-repeat="adjuster in adjusters")
+            td {{ adjuster.ADJUSTER_ID }}
+            td {{ adjuster.ADJUSTER_NAME }}
+            td {{ adjuster.ADJUSTER_PHONE }}

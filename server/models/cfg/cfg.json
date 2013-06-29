@@ -1,0 +1,14 @@
+{
+
+    "host": "127.0.0.1",
+    "port": 3050,
+    "user": "SYSDBA",
+    "password": "COMOPARK",
+    "role": null,
+    "pagesize": 8192,
+    "charset": "UTF8",
+
+    "database": "c:\\firebird\\data\\mas\\mas.gdb"
+
+
+}

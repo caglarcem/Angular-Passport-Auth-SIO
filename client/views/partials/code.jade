@@ -1,0 +1,34 @@
+p
+    #inside
+    #header
+        input.search-query(style='width:100px', type='text', ng-model='filterText', placeholder='Filter')
+// input.search-query(style='width:100px', type='text', ng-model='gridOptions1.filterOptions.filterText', placeholder='Filter')
+        span(style='color:white;font-weight:bold')
+            &nbsp;&nbsp;&nbsp;&nbsp;User:&nbsp;
+            span #{username}
+
+    #main-content
+
+
+
+        .span8.body-content
+
+
+
+
+            angular-table(model='types',filter-query-model='filterText', default-sort-column='id',class="demoTable", style="padding-bottom: 1px;")
+              header-row
+
+                header-column(sortable='true', sort-field-name='id', class="demoHeaderColumn")
+                        div(style='display: inline-block;') Id
+                        sort-arrow-ascending
+                        sort-arrow-descending
+                header-column(sortable='true', sort-field-name='name', class="demoHeaderColumn")
+                        | Name
+
+                row(on-selected='handleRowSelection(row)', selected-color='#87cefa', even-color='#ffffff', odd-color='#eeeeee')
+                        column {{ row.id }}
+                        column {{ row.name }}
+
+
+

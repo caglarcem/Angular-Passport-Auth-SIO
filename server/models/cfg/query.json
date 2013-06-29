@@ -1,0 +1,8 @@
+
+{
+    "qrystr1":'SELECT "idevents" "id","evtUser" "User",	"evtText" "event", "evtSymbol" "symbol", "evtTarget" "Targets" FROM "events" WHERE "idevents" > 0  ORDER BY "idevents" ASC",
+    "qrystr2": '"Select * from "Codes"'
+
+}
+
+

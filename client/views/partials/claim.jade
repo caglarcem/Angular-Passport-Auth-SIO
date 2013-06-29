@@ -1,0 +1,102 @@
+p
+    #inside
+    #header
+                   input.search-query(style='width:100px', type='text', ng-model='filterText', placeholder='Filter')
+                      // input.search-query(style='width:100px', type='text', ng-model='gridOptions1.filterOptions.filterText', placeholder='Filter')
+                   span(style='color:white;font-weight:bold')
+                        &nbsp;&nbsp;&nbsp;&nbsp;User:&nbsp;
+                        span #{username}
+
+    #main-content
+
+
+    .span3.sidebar-content
+            h2 Open Claims
+            h6 (Adj Thomas Costa:135)
+
+
+                .claim(class='claim',ng-repeat='claim in claims | filter:filterText', ng-click='setCurrentClaim(claim)')
+                    h6 {{claim.title}}
+                    h6 {{claim.DESCRIPTION}}
+
+                    h6 Rcvd: {{claim.RECEIVED  | moment:'ddd MM/DD/YYYY'}}
+
+                br
+            a.btn(ng-click='createClaim()')
+                    i.icon-plus
+
+        .span8.body-content
+
+          h2 Daily grid for claim: {{currentClaim.title}}
+           select(style="width:100px",ng-model="currentType",ng-readonly='true',ng-disabled='true', ng-options="t.name for t in types",required)
+           form.form-horizontal
+
+
+        .span8.body-content
+
+
+
+
+          tabs(on-select='tabWasSelected($index)',active-id="model.activePaneId",ng-click='tabWasSelected($index)')
+            pane(heading='Grid by ClaimNo',on-select='tabWasSelected($index)',ng-click='tabWasSelected($index)')
+                span(style='color:#069;font-weight:bold')
+                div(style='width: 100%; height: 350px;', ng-grid='gridOptions1')
+            pane(heading='By Date',on-select='tabWasSelected($index)',ng-click='tabWasSelected($index)')
+                span(style='font-weight:bold' ) Enter start date
+                    i.icon-circle-arrow-right
+                    input(ng-model='form.SET_WORK_DATE1', ui-date="{ dateFormat: 'DD , mm/dd/yy' }" )
+                    | end date
+                    input(ng-model='form.SET_WORK_DATE2', ui-date="{ dateFormat: 'DD , mm/dd/yy' }" )
+                    a.btn.btn-success(ng-click='changeData(form)')  Search by Date
+                        i.icon-dashboard
+                span(style='color:#069;font-weight:bold')
+                div(style='width: 100%; height: 350px;', ng-grid='gridOptions2')
+
+
+
+
+          a.btn.btn-success(ng-click='createDaily()')  Add New Daily
+                i.icon-plus
+          span(style='font-weight:bold' ) Enter default date
+                i.icon-circle-arrow-right
+                input(ng-model='form.SET_WORK_DATEDEF', ui-date="{ dateFormat: 'DD , mm/dd/yy' }" )
+                i.icon-circle-arrow-right
+                input(ng-model='currentClaimNo' )
+            form.form-horizontal
+              .control-group
+                  label.control-label(for='inputWorkDate') Date
+                  .controls
+                      input#inputWorkDate(ng-model='currentDaily.WORK_DATE',ui-date="{ dateFormat: 'mm/dd/yy' }", ui-date-format="mm/dd/yy",ng-disabled='currentDaily.AR_ID!="null"' )
+              .control-group
+                  label.control-label(for='inputWorkTime') Time
+                  .controls
+                      input#inputWorkTime(type='text', placeholder='Time', ng-model='currentDaily.WORK_TIME',ng-disabled='currentDaily.AR_ID!="null"')
+              .control-group
+                  label.control-label(for='inputWorkDescription') WorkDescription
+                  .controls
+                      textarea#inputAcceptance(placeholder='WorkDescription' , rows='3', ng-model='currentDaily.WORK_DESCRIPTION',ng-disabled='currentDaily.AR_ID!="null"')
+
+
+              .control-group
+                  label.control-label(for='service')   Service
+                  .controls
+                      select#serviceDesc(ng-model='currentService', ng-options='l.name for l in services', ng-change='setCurrentService(currentService)',ng-disabled='currentDaily.AR_ID!="null"')
+
+              .control-group
+                  label.control-label(for='inputMileage') Mileage
+                  .controls
+                      input#inputMileage(type='number', placeholder='Mileage', ng-model='currentDaily.MILEAGE',ng-disabled='currentDaily.AR_ID!="null"',min="0" ,max="1000" ,integer)
+              .control-group
+                  label.control-label(for='inputExpense') Expense
+                  .controls
+
+                      select#inputExpense(ng-model='currentExpense', ng-options='l.name for l in expenses', ng-change='setCurrentExpense(currentExpense)',ng-disabled='currentDaily.AR_ID!="null"')
+                .control-group
+                    label.control-label(for='inputExpenseAmt') Expense Amt
+                    .controls
+                        input#inputExpense(type='text', placeholder='Amt', ng-model='currentDaily.EXPENSE',ng-disabled='currentDaily.AR_ID!="null"' ,smart-float)
+
+          a.btn.btn-success(ng-click='postDaily()',ng-disabled='currentDaily.AR_ID!="null"',ng-hide='currentDaily.AR_ID!=="null"')  Save Daily »
+
+
+
