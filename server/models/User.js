@@ -8,24 +8,15 @@ var User
     , check =           require('validator').check
     , userRoles =       require('../../client/js/routingConfig').userRoles
     , fs = require('fs')
-    ,  fb = require('node-firebird');
+    , fb = require('node-firebird');
 //    , socketIo = require("socket.io")
 //    , passportSocketIo = require("passport.socketio");
 
 
 // modified for Firebird by JRT
 var users;
-////
 var CFG = LoadConfig();
-
-//
 console.log('users',users);
-//console.log(CFG);
-//CFG.connections = CFG.connections || [];
-//console.log('---------CFG.host,CFG.port, CFG.database,CFG.user,CFG.password,CFG.pagesize,CFG.role---------');
-//console.log(CFG.host, CFG.port, CFG.database, CFG.user, CFG.password, CFG.pagesize, CFG.role);
-//console.log('------------------');
-
 fb.attachOrCreate(
     {
         host: CFG.host, database: CFG.database, user: CFG.user, password: CFG.password
@@ -55,35 +46,19 @@ function LoadConfig() {
     return cfg;
 };
 
-
 function getusers() {
     var jsondata = new Array();
-    qrystr = 'select ID "id", "Staff Init" "username" ,"WebPassword" "password", "role" from "Staff" where id >0';
+    qrystr = 'select ID "id", "Staff Init" "username" ,"WebPassword" "password", "role" ,"AdjusterID" "adjusterid" from "Staff" where id >0';
     database.execute(qrystr, function (err, results, fields) {
             console.log('database.query result "Staff"  ', results);
 
             wrapJson(results, fields, jsondata);
-//            output = {"Code1": jsondata};
-//            users =     jsondata;
-//            console.log('users ',users)
         },
         logerror);
     return jsondata;
 };
 
-/*
- getusers = function () {
- qrystr = 'select ID "id", "Staff Init" "username" ,"WebPassword" "password", "role" from "Staff" where id >0';
- database.execute(qrystr, function (err, results, fields) {
- console.log('database.query result "Staff"  ', results);
- var jsondata = new Array();
- wrapJson(results, fields, jsondata);
- output = {"Code1": jsondata};
- },
- logerror);
- return jsondata;
- };
- */
+
 
 
 function logerror(err) {
@@ -208,7 +183,8 @@ module.exports = {
             id:         _.max(users, function(user) { return user.id; }).id + 1,
             username:   username,
             password:   password,
-            role:       role
+            role:       role,
+            adjusterid:   adjusterid //"AdjusterID"
         };
         users.push(user);
         callback(null, user);
