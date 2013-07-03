@@ -3,19 +3,15 @@
  */
 var Adjusters
     , _ = require('underscore')
-
     , fs = require('fs')
     , moment = require('moment')
     , fb = require('node-firebird')
-   , User =      require('./models/User.js')
-   , UserCtrl =  require('./controllers/user')
-    , AuthCtrl =  require('./controllers/auth')
-    , passport =  require('passport')
-    ;
-// , express = require('express.io');
+    , User = require('./models/User.js')
+    , UserCtrl = require('./controllers/user')
+    , AuthCtrl = require('./controllers/auth')
+    , passport = require('passport')    ;
 // modified for Firebird by JRT
 var adjusters;
-////
 var CFG = LoadConfig();
 fb.attachOrCreate(
     {
@@ -48,21 +44,13 @@ function LoadConfig() {
 
 
 function getadjusters() {
-//    console.log('======getadjusters - UserCtrl===============', UserCtrl.username);//  () User.user)
-
     var jsondata = new Array();
     qrystr = 'select ADJUSTER_ID, ADJUSTER_NAME, ADJUSTER_PHONE, ADJUSTER_EXT, "Email" from ADJUSTER where ADJUSTER_ID <20';
     database.execute(qrystr, function (err, results, fields) {
-            // console.log('database.query result "Staff"  ', results);
-
             wrapJson(results, fields, jsondata);
-//            output = {"Code1": jsondata};
-//            users =     jsondata;
-//            console.log('users ',users)
         },
         logerror);
     console.log('======getadjusters===============', jsondata)
-
     return jsondata;
 };
 
@@ -161,8 +149,11 @@ function wrapJson(results, fields, jsondata) {
     return jsondata;
 }
 module.exports = function (socket) {
-    //   console.log(socket.name3)
-    console.log('====================');
+
+
+    var user = socket.handshake.session;//.user_id;
+    console.log('==user1==================', user);
+    console.log('==user1=PASSPORT=================', user.passport.user);
     console.log('socketapp ');//.sio)
     console.log('====================');
 
@@ -186,7 +177,13 @@ module.exports = function (socket) {
     }, 1000);
 
     socket.on('getAdjusters', function (data) {
-        console.log('======getadjusters - UserCtrl===============', UserCtrl.username);//  () User.user)
+        var user = socket.handshake.session;//.user_id;
+//        console.log('====user================',user.passport.user);//,' ',user.passport.adjusterid);//socket.handshake.session.req.session.req.user);// .session.req.session.req.user);// passport);//.username);
+//
+        var adj = user.req.session.req.user.adjusterid;
+        console.log('====2user2================', adj);//socket.handshake.req.user);//  session.req.user);//,' ',user.passport.adjusterid);//socket.handshake.session.req.session.req.user);// .session.req.session.req.user);// passport);//.username);
+
+        //   console.log('======getadjusters - UserCtrl===============', UserCtrl.username);//  () User.user)
 
 
         qrystr = 'select ADJUSTER_ID, ADJUSTER_NAME, ADJUSTER_PHONE, ADJUSTER_EXT, "Email" from ADJUSTER where ADJUSTER_ID <20';
@@ -203,20 +200,7 @@ module.exports = function (socket) {
         });
     });
 
-//    socket.on('getcodeTypes', function (data) {
-//        qrystr = 'select CLAIM_TYPE_DESC "name", CLAIM_TYPE_ID "id" from CLAIM_TYPE  order by CLAIM_TYPE_DESC'
-//        console.log('qrystr: ', qrystr);
-//        console.log('==============================================================');
-//        console.log('===================getcodeTypes===============================');
-//        database.execute(qrystr, function (err, results, fields) {
-//            var jsondata = new Array();
-//            // console.log('\n\rThese are the fields====================================================', fields);
-//
-//            wrapJson(results, fields, jsondata);
-//            output = {"Code1": jsondata};
-//            socket.emit('initcode1', output);
-//        });
-//    });
+
 
     socket.on('getClaimsAdminColumns', function (data) {
         var user = socket.handshake.session.user_id;
@@ -288,10 +272,13 @@ module.exports = function (socket) {
     });
 
     socket.on('getclaims', function (data) {
-        //var adj = socket.handshake.session.adjuster_id;
-        console.log('======getclaims - UserCtrl===============', UserCtrl.username);//  () User.user)
+        var user = socket.handshake.session;//.user_id;
 
-        var adj = 135;
+        var adj = user.req.session.req.user.adjusterid;
+
+        console.log('======getclaims - UserCtrl===============', adj);//  () User.user)
+
+
         console.log('jrt==========adj ', adj)
         qrystr = 'select CLAIM_ID "id", CLAIM_NO "title" , INSURED_ID, CLAIM_TYPE "type", ADJUSTER_ID, ACCOUNT_REP_ID "reporter" , INSURANCE_COMPANY_ID "assignee"  , \
             description,status "status",   DATE_OF_LOSS, POLICY_NUMBER,REPORTED,RECOVERY_COMMENTS,RECEIVED from CLAIM where ADJUSTER_ID= ? and status = 1 ';
@@ -310,12 +297,9 @@ module.exports = function (socket) {
 
 
     socket.on('getdaily', function (data) {
-        console.log('============');
-        console.log('======getdailiy - passport ===',passport);//AuthCtrl===============',AuthCtrl);//.username );//  () User.user)
-        //console.log('======getdailiy - UserCtrl2===============', User);//  () User.user)
-
-        console.log('getdailiy. data:', data.title, data);
-        console.log('============\n');
+        console.log(User, passport, UserCtrl)
+        var juser = User.localStrategy;//.username;/// deserializeUser();// passport.deserializeUser();// User.localStrategy.session      // socket.handshake.session.user_id;
+        console.log('==juser=========', juser);
         var newkey;
         qrystr = 'select DD.DAILY_DETAIL_ID, DD.DAILY_ID, DD.WORK_DATE, DD.WORK_DESCRIPTION, DD.SERVICE_ID, DD.MILEAGE, DD.EXPENSE, \
                 DD.EXPENSE_TYPE_ID, DD.WORK_TIME, DD.AR_ID, DD.AR_DATE, DD.CLAIM_ID, DD.CLAIM_NO, DD.WEEKOF , c1.description "servicedesc",c2.description "expensedesc"  \
@@ -326,12 +310,19 @@ module.exports = function (socket) {
                 c1.sort_no= DD.SERVICE_ID \
                 left join code c2 on \
                 c2.sort_no= DD.EXPENSE_TYPE_ID \
-                where DD.CLAIM_NO=  ? ';
+                where DD.CLAIM_NO=  ? \
+                and dd.ar_id is null';
         database.execute(qrystr, [data.title], function (err, results, fields) {
-            var jsondata = new Array();
-            wrapJson(results, fields, jsondata);
-            output = {"Daily": jsondata};
-            console.log('jsondata-1.', output);
+            if (results != '') {
+                var jsondata = new Array();
+                wrapJson(results, fields, jsondata);
+                output = {"Daily": jsondata};
+                //   console.log('jsondata-1.', output);
+            } else {
+                output = 'Empty';//
+                //output =  {"Daily":{DAILY_DETAIL_ID: 'new',DAILY_ID_: 0, WORK_DATE: '', WORK_TIME: '.10', WORK_DESCRIPTION: 'Work Description pending.', MILEAGE: '0', EXPENSE: 0,CLAIM_NO:'null',AR_ID:'null'}};
+// {"Daily":'DAILY_DETAIL_ID:0'}
+            }
             socket.emit('initdaily', output);
         });
     });
