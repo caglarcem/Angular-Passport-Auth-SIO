@@ -7,15 +7,16 @@ Angular-Passport-Auth-SIO
 
 #### https://github.com/jfromaniello/passport.socketio
 
-### major league help from Michael Robinson at faceleg
-### This is a major demonstration  of express.io,  passport, passport.socketio, firebird sql and angular.
+### Major League help from Michael Robinson at faceleg
+### This is a complete demonstration  of express.io,  passport, passport.socketio, firebird sql and angular.
 I've included all the code for those it might help.
-Notes:
-======
-#### Firebird is an open source sql database see (firebirdsql.org , ibphoeninx.com) and can easily be replaced by mysql.
-#### I use the database for local authentication (see \Server\Models\User.js)
-#### socket.js uses the authenication credentials to bring only the data for logged in user. See \Server\socket.js and  Usage
-#### I will refactor this code asap to make it more efficient
+
+## Notes:
+
+- [Firebird] (http://firebirdsql.org) (http://ibphoeninx.com) open source sql database and can easily be replaced by mysql.
+- I use the database for local authentication (see \Server\Models\User.js)
+- socket.js uses the authenication credentials to bring only the data for logged in user. See \Server\socket.js and  Usage
+- I will refactor this code asap to make it more efficient
 
 Usage 
 =====
