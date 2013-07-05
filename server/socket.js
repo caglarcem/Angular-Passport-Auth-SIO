@@ -1,156 +1,58 @@
 /*
  * Serve content over a socket
  */
-var Adjusters
-    , _ = require('underscore')
-    , fs = require('fs')
-    , moment = require('moment')
-    , fb = require('node-firebird')
-    , User = require('./models/User.js')
-    , UserCtrl = require('./controllers/user')
-    , AuthCtrl = require('./controllers/auth')
-    , passport = require('passport')    ;
+//var Adjusters
+var  _ = require('underscore');
+var  firebird = require('./firebird.js');
+//    , fs = require('fs')
+//    , moment = require('moment')
+//    , fb = require('node-firebird')
+//    , User = require('./models/User.js')
+//    , UserCtrl = require('./controllers/user')
+//    , AuthCtrl = require('./controllers/auth')
+//    , passport = require('passport')
+
+//    , async = require('async')
+// , q = require('q');
+
 // modified for Firebird by JRT
-var adjusters;
-var CFG = LoadConfig();
-fb.attachOrCreate(
-    {
-        host: CFG.host, database: CFG.database, user: CFG.user, password: CFG.password
-    },
-    function (err, db) {
-        if (err) {
-            console.log(err.message);
-        } else {
-            database = db;
+//var adjusters;
+////
+//var CFG = LoadConfig();
+//fb.attachOrCreate(
+//    {
+//        host: CFG.host, database: CFG.database, user: CFG.user, password: CFG.password
+//    },
+//    function (err, db) {
+//        if (err) {
+//            console.log(err.message);
+//        } else {
+//            database = db;
+//
+//            //  adjusters = getadjusters();
+//            console.log("\n\r db connected ");
+//        }
+//    }
+//);
+//function LoadConfig() {
+//    var cfg = {};
+//    try {
+//        fs.statSync(__dirname + '/models/cfg/cfg.json');
+//        var sCfg = fs.readFileSync(__dirname + '/models/cfg/cfg.json', 'utf8');
+//        cfg = JSON.parse(sCfg);
+//        console.log('CFG ', __dirname);
+//    }
+//    catch (e) {
+//        console.log("Error loading config " + e.message)
+//    }
+//    return cfg;
+//};
+//
+//function logerror(err) {
+//    console.log(err.message);
+//}
 
-            //  adjusters = getadjusters();
-            console.log("\n\r db connected ");
-        }
-    }
-);
-function LoadConfig() {
-    var cfg = {};
-    try {
-        fs.statSync(__dirname + '/models/cfg/cfg.json');
-        var sCfg = fs.readFileSync(__dirname + '/models/cfg/cfg.json', 'utf8');
-        cfg = JSON.parse(sCfg);
-        console.log('CFG ', __dirname);
-    }
-    catch (e) {
-        console.log("Error loading config " + e.message)
-    }
-    return cfg;
-};
-
-
-function getadjusters() {
-    var jsondata = new Array();
-    qrystr = 'select ADJUSTER_ID, ADJUSTER_NAME, ADJUSTER_PHONE, ADJUSTER_EXT, "Email" from ADJUSTER where ADJUSTER_ID <20';
-    database.execute(qrystr, function (err, results, fields) {
-            wrapJson(results, fields, jsondata);
-        },
-        logerror);
-    console.log('======getadjusters===============', jsondata)
-    return jsondata;
-};
-
-
-function logerror(err) {
-    console.log(err.message);
-}
-function wrapJson(results, fields, jsondata) {
-
-    var tloop = fields;
-
-    var ftype = '';
-    _.each(tloop, function (metadesc, key) {
-            fields[key] = metadesc.alias;
-            ftype[key] = metadesc.type;
-            //   console.log(fields[key], ' :', metadesc, key)
-        }
-    );
-
-    // console.log('wrapJson ', fields)
-    var maxCols = fields.length - 1;
-    var holdrow = '';
-    var fieldtype = '';
-    var fieldname = '';
-    var value = '';
-
-    _.each(_.toArray(results), function (humheader, keyheader) {
-            holdrow = '';
-            _.each(fields, function (num, key) {
-                    // for json and ngrid let get rid of spaces
-                    fieldname = fields[key];
-                    fieldtype = ftype[key];
-                    fieldname = fieldname.replace(/ /gi, "");// golabal replace flag gi str.replace(/<br>/gi,'\r');
-                    value = humheader[key];
-
-//                    if (value != undefined )
-//                    {
-//                        //value = '';
-//                        value =   value.replace(/\r\n/gi, "");
-//                    }
-
-                    if (fieldname === 'QA_Notes') {
-                        if (value != undefined) {
-
-                            value = value.replace(/\r\n/gi, "");
-                            value = value.replace(/"/gi, "");
-
-                            //value =   value.replace(/\n/gi, "");
-                            //value =   value.replace(/\r/gi, "");
-                        }
-                    }
-                    if (fieldname === 'WebPassword') {
-
-
-                        //   wrapJson(results, fields, jsondata);
-                        if (value != undefined) {
-                            var strct = new Array();
-
-                            holdrow += '"role":' + userRoles.admin + ',';
-
-                        }
-                    }
-
-
-                    if (fieldname.match(/Date/gi)) {
-                        if (value != undefined) {
-                            value = moment(value).format("MM/DD/YYYY");
-                        }
-                    }
-
-
-                    if (key == 0) {
-                        holdrow += '{"' + fieldname + '":"' + value + '",';
-                    }
-                    else if (key == maxCols) {
-                        holdrow += '"' + fieldname + '":"' + value + '"}';
-
-                    } else {
-                        //if (fieldname==='Estimated_Rev'){
-                        if (fieldtype === 496) {
-
-                            // send integer #
-
-                            holdrow += '"' + fieldname + '":' + value + ',';
-                        }
-                        else {
-                            holdrow += '"' + fieldname + '":"' + value + '",';
-                        }
-                    }
-                }
-            );
-            jsondata[keyheader] = JSON.parse(holdrow);
-        }
-    );
-
-    return jsondata;
-}
 module.exports = function (socket) {
-
-
     var user = socket.handshake.session;//.user_id;
     console.log('==user1==================', user);
     console.log('==user1=PASSPORT=================', user.passport.user);
@@ -178,29 +80,76 @@ module.exports = function (socket) {
 
     socket.on('getAdjusters', function (data) {
         var user = socket.handshake.session;//.user_id;
-//        console.log('====user================',user.passport.user);//,' ',user.passport.adjusterid);//socket.handshake.session.req.session.req.user);// .session.req.session.req.user);// passport);//.username);
-//
         var adj = user.req.session.req.user.adjusterid;
         console.log('====2user2================', adj);//socket.handshake.req.user);//  session.req.user);//,' ',user.passport.adjusterid);//socket.handshake.session.req.session.req.user);// .session.req.session.req.user);// passport);//.username);
 
-        //   console.log('======getadjusters - UserCtrl===============', UserCtrl.username);//  () User.user)
-
-
         qrystr = 'select ADJUSTER_ID, ADJUSTER_NAME, ADJUSTER_PHONE, ADJUSTER_EXT, "Email" from ADJUSTER where ADJUSTER_ID <20';
 
-        console.log('qrystr: ', qrystr);
+        console.log('c: ', qrystr);
         console.log('==============================================================');
-        database.execute(qrystr, function (err, results, fields) {
-            var jsondata = new Array();
-            // console.log('\n\rThese are the fields======================== ============================', fields);
-
-            wrapJson(results, fields, jsondata);
+        //firebird.database().execute(qrystr, function (err, results, fields) {
+            database.execute(qrystr, function (err, results, fields) {
+        var jsondata = new Array();
+        firebird.wrapJson(results, fields, jsondata);
             output = {"Adjusters": jsondata};
             socket.emit('initAdjusters', output);
-        });
+            //console.log('=====from socket wrapJsonwithQry========',jsondata);
+
+  //      jsondata=  getClaims();
+//        getClaims().then(function(result){
+//            console.log('=====from socket wrapJsonwithQry========',result,jsondata);
+        })
+
     });
 
+//        getClaims =  function () {
+//            if (deferred === null) {
+//                initClaims();
+//            }
+//            return deferred.promise;
+//        }
+//        initClaims = function () {
+//            deferred = q.defer();
+//            setTimeout(function () {
+//                firebird.wrapJsonwithQry( qrystr,jsondata)
+//                deferred.resolve(jsondata);
+//            }, 1000);
+//            return deferred.promise;
+//
+//        } });
 
+
+
+//   var task= firebird.wrapJsonwithQry( qrystr, jsondata);
+//        var q = async.queue(function ( firebird.wrapJsonwithQry( qrystr, jsondata), callback) {
+//            console.log('hello ' + task.name);
+//            callback();
+//        }, 2);
+//    async. series([firebird.wrapJsonwithQry( qrystr, jsondata)]);
+//    jsondata2=;
+//        async.parallel({
+//                jsondata: firebird.wrapJsonwithQry( qrystr))//;;, jsondata)
+//                //,        titles: queryRow('title', 'code_samples')
+//            },
+//   function(result) {
+//                console.log('=====from socket wrapJsonwithQry========',result.jsondata);
+////                res.render('home.ejs', {
+////                    layout: false,
+////                    locals: {user_name: result.users, title: result.titles}
+////                });
+//   });
+//   var outputPromise = firebird.wrapJsonwithQry( qrystr)
+//        then(console.log(outputPromise)) {
+//   });
+//   var deferred = q.defer();
+//   FS.readFile("foo.txt", "utf-8", deferred.makeNodeResolver());
+//   deferred.firebird.wrapJsonwithQry( qrystr,jsondata)
+//   return deferred.promise;
+//   initClaims();
+//   async.series([
+//   output = {"Adjusters": jsondata};
+//       socket.emit('initAdjusters', output);
+//   });
 
     socket.on('getClaimsAdminColumns', function (data) {
         var user = socket.handshake.session.user_id;
@@ -208,7 +157,7 @@ module.exports = function (socket) {
         console.log('======================== ');
         console.log('qrystr ', qrystr);
         console.log('======================== ');
-        database.query(qrystr, function (err, results, fields) {
+        firebird.database.query(qrystr, function (err, results, fields) {
             if (results != undefined) {
                 jsondata = JSON.parse(results[0][0]);// get Cols
             } else {
@@ -220,86 +169,81 @@ module.exports = function (socket) {
             console.log('results ', util.inspect(results));
         });
     });
-
     socket.on('sendClaimsAdminGrid', function (data) {
         var user = socket.handshake.session.user_id;
         insertstr = ' execute procedure "WebGrid_IU"(?,?,?)';
         console.log('  insertstr ', insertstr);
-        database.query(insertstr, [  1, JSON.stringify(data), user ], function (err, results, fields) {//,user
+        firebird.database.query(insertstr, [  1, JSON.stringify(data), user ], function (err, results, fields) {//,user
             jsondata = {'data ': 'this is response1'};
             output = {"responseClaimsAdminGrid": jsondata};
             socket.emit('responseClaimsAdminGrid', output);
             console.log('responseClaimsAdminGrid  ', output);
         });
-
     });
-
     socket.on('getcodeTypes', function (data) {
         qrystr = 'select CLAIM_TYPE_DESC "name", CLAIM_TYPE_ID "id" from CLAIM_TYPE  order by CLAIM_TYPE_DESC';
         console.log('qrystr: ', qrystr);
         console.log('==============================================================');
         console.log('===================getcodeTypes===============================');
-        database.execute(qrystr, function (err, results, fields) {
+        firebird.database().execute(qrystr, function (err, results, fields) {
             var jsondata = new Array();
-            wrapJson(results, fields, jsondata);
+//            wrapJson(results, fields, jsondata);
+            firebird.wrapJson(results, fields, jsondata);
             output = {"Code1": jsondata};
             socket.emit('initcode1', output);
         });
     });
-
     socket.on('getcodeService', function (data) {
         qrystr = 'select sort_no "id", description "name" from code where code_type_id =1  order by  description';
         console.log('qrystr: ', qrystr);
         console.log('==============================================================');
-        database.execute(qrystr, function (err, results, fields) {
+        firebird.database().execute(qrystr, function (err, results, fields) {
             var jsondata = new Array();
-            wrapJson(results, fields, jsondata);
+            //wrapJson(results, fields, jsondata);
+            firebird.wrapJson(results, fields, jsondata);
+
             output = {"Code2": jsondata};
             socket.emit('initcode2', output);
         });
     });
-
     socket.on('getcodeExpense', function (data) {
         qrystr = 'select sort_no "id", description "name" from code where code_type_id =3   order by code_type_id,description';
         console.log('qrystr: ', qrystr);
         console.log('==============================================================');
-        database.execute(qrystr, function (err, results, fields) {
+        firebird.database().execute(qrystr, function (err, results, fields) {
             var jsondata = new Array();
-            wrapJson(results, fields, jsondata);
+//            wrapJson(results, fields, jsondata);
+            firebird.wrapJson(results, fields, jsondata);
             output = {"Code3": jsondata};
             socket.emit('initcode3', output);
         });
     });
-
     socket.on('getclaims', function (data) {
         var user = socket.handshake.session;//.user_id;
-
         var adj = user.req.session.req.user.adjusterid;
-
         console.log('======getclaims - UserCtrl===============', adj);//  () User.user)
-
-
         console.log('jrt==========adj ', adj)
         qrystr = 'select CLAIM_ID "id", CLAIM_NO "title" , INSURED_ID, CLAIM_TYPE "type", ADJUSTER_ID, ACCOUNT_REP_ID "reporter" , INSURANCE_COMPANY_ID "assignee"  , \
             description,status "status",   DATE_OF_LOSS, POLICY_NUMBER,REPORTED,RECOVERY_COMMENTS,RECEIVED from CLAIM where ADJUSTER_ID= ? and status = 1 ';
         console.log('qrystr: ', qrystr, [adj ]);
         console.log('==============================================================');
 
-
-        database.execute(qrystr, [adj], function (err, results, fields) {
+        //firebird.database().execute(qrystr, [adj], function (err, results, fields) {
+            database.execute(qrystr, [adj], function (err, results, fields) {
             var jsondata = new Array();
-            wrapJson(results, fields, jsondata);
+            //wrapJson(results, fields, jsondata);
+            firebird.wrapJson(results, fields, jsondata);
+
             output = {"Claims": jsondata};
             socket.emit('initclaims', output);
         });
 
     });
-
-
     socket.on('getdaily', function (data) {
-        console.log(User, passport, UserCtrl)
-        var juser = User.localStrategy;//.username;/// deserializeUser();// passport.deserializeUser();// User.localStrategy.session      // socket.handshake.session.user_id;
-        console.log('==juser=========', juser);
+    //    console.log(User, passport, UserCtrl)
+    //    var juser = User.localStrategy;//.username;/// deserializeUser();// passport.deserializeUser();// User.localStrategy.session      // socket.handshake.session.user_id;
+   //     console.log('==juser=========', juser);
+   //     console.log('============\n');
         var newkey;
         qrystr = 'select DD.DAILY_DETAIL_ID, DD.DAILY_ID, DD.WORK_DATE, DD.WORK_DESCRIPTION, DD.SERVICE_ID, DD.MILEAGE, DD.EXPENSE, \
                 DD.EXPENSE_TYPE_ID, DD.WORK_TIME, DD.AR_ID, DD.AR_DATE, DD.CLAIM_ID, DD.CLAIM_NO, DD.WEEKOF , c1.description "servicedesc",c2.description "expensedesc"  \
@@ -312,16 +256,14 @@ module.exports = function (socket) {
                 c2.sort_no= DD.EXPENSE_TYPE_ID \
                 where DD.CLAIM_NO=  ? \
                 and dd.ar_id is null';
-        database.execute(qrystr, [data.title], function (err, results, fields) {
+        //firebird.database().execute(qrystr, [data.title], function (err, results, fields) {
+           database.execute(qrystr, [data.title], function (err, results, fields) {
             if (results != '') {
                 var jsondata = new Array();
-                wrapJson(results, fields, jsondata);
+                firebird.wrapJson(results, fields, jsondata);
                 output = {"Daily": jsondata};
-                //   console.log('jsondata-1.', output);
             } else {
                 output = 'Empty';//
-                //output =  {"Daily":{DAILY_DETAIL_ID: 'new',DAILY_ID_: 0, WORK_DATE: '', WORK_TIME: '.10', WORK_DESCRIPTION: 'Work Description pending.', MILEAGE: '0', EXPENSE: 0,CLAIM_NO:'null',AR_ID:'null'}};
-// {"Daily":'DAILY_DETAIL_ID:0'}
             }
             socket.emit('initdaily', output);
         });
@@ -344,16 +286,14 @@ module.exports = function (socket) {
                 left join code c2 on \
                 c2.sort_no= DD.EXPENSE_TYPE_ID \
                 where ((DD.WORK_DATE >= ? and DD.WORK_DATE <= ?) and C.ADJUSTER_ID=?) ';
-        database.execute(qrystr, [moment(data.SET_WORK_DATE1).format("MM/DD/YYYY") , moment(data.SET_WORK_DATE2).format("MM/DD/YYYY"), adj], function (err, results, fields) {
+        firebird.database().execute(qrystr, [moment(data.SET_WORK_DATE1).format("MM/DD/YYYY") , moment(data.SET_WORK_DATE2).format("MM/DD/YYYY"), adj], function (err, results, fields) {
             var jsondata = new Array();
-            wrapJson(results, fields, jsondata);
+            firebird.wrapJson(results, fields, jsondata);
             output = {"Daily": jsondata};
             console.log('jsondata-1.', output);
             socket.emit('initdailybydate', output);
         });
     });
-
-
     socket.on('senddaily', function (data) {
         var newkey;
         var str = data.DAILY_DETAIL_ID + "','" + data.DAILY_ID + "','" + data.WORK_DATE + "','" + data.WORK_DESCRIPTION + "','" + data.SERVICE_ID + "','" + data.MILEAGE + "','" + data.EXPENSE + "','" + data.EXPENSE_TYPE_ID + "','" + data.WORK_TIME + data.CLAIM_NO + "'";
@@ -365,13 +305,11 @@ module.exports = function (socket) {
             console.log('update============', data.DAILY_DETAIL_ID);
 
         console.log(data.DAILY_DETAIL_ID, data.DAILY_ID, data.WORK_DATE, data.WORK_DESCRIPTION, data.SERVICE_ID, data.MILEAGE, data.EXPENSE, data.EXPENSE_TYPE_ID, data.WORK_TIME, data.CLAIM_NO);
-        database.execute('select NEWID  from  DAILY_DETAIL_IU (?,?,?,?,?, ?,?,?,?,?)', [data.DAILY_DETAIL_ID, data.DAILY_ID, data.WORK_DATE, data.WORK_DESCRIPTION, data.SERVICE_ID, data.MILEAGE, data.EXPENSE, data.EXPENSE_TYPE_ID, data.WORK_TIME, data.CLAIM_NO], // success
+        firebird.database().execute('select NEWID  from  DAILY_DETAIL_IU (?,?,?,?,?, ?,?,?,?,?)', [data.DAILY_DETAIL_ID, data.DAILY_ID, data.WORK_DATE, data.WORK_DESCRIPTION, data.SERVICE_ID, data.MILEAGE, data.EXPENSE, data.EXPENSE_TYPE_ID, data.WORK_TIME, data.CLAIM_NO], // success
             function (err, results, fields) {
                 _.each(results, function (num, key) {
-
                         console.log('n k ', num, key, num[0]);
                         newkey = num[0];
-
                     }
                 )
                 output = {"result": newkey}; // resultx
@@ -382,16 +320,15 @@ module.exports = function (socket) {
     socket.on('getcode27', function (data) {
         qrystr = ' SELECT "Description" "text", "String Value"  "value" FROM SP_CODES(27,1)';
 
-        database.execute(qrystr, function (err, results, fields) {
+        firebird.database().execute(qrystr, function (err, results, fields) {
             var jsondata = new Array();
-            wrapJson(results, fields, jsondata);
+//            wrapJson(results, fields, jsondata);
+            firebird.wrapJson(results, fields, jsondata);
             output = {"Code27": jsondata};
             console.log(' output 27 ', output)
             socket.emit('initcode27', output);
         });
     });
-
-
     socket.on('getClaimsAdmin', function (data) {
         console.log('io.sockets.on for getprojet. data:  ', data);
         console.log('=========================================================== ');
@@ -402,17 +339,15 @@ module.exports = function (socket) {
                 "expensedesc",                ADJUSTER_NAME,                LEGAL_NAME,                COMMON_NAME,                NAME\
                 from MAN1_VIEW\
              where (WORK_DATE >= ? and WORK_DATE <= ?)  ';
-        database.execute(qrystr, [moment(data.dtStart).format("MM/DD/YYYY") , moment(data.dtEnd).format("MM/DD/YYYY")], function (err, results, fields) {
+        firebird.database().execute(qrystr, [moment(data.dtStart).format("MM/DD/YYYY") , moment(data.dtEnd).format("MM/DD/YYYY")], function (err, results, fields) {
             var jsondata = new Array();
-            wrapJson(results, fields, jsondata);
-            console.log('\n\r===', jsondata.length);
-
+//            wrapJson(results, fields, jsondata);
+            firebird.wrapJson(results, fields, jsondata);
+           // console.log('\n\r===', jsondata.length);
             output = {"ClaimsAdmin": jsondata};
             socket.emit('initClaimsAdmin', output);
         });
     });
-
-
     socket.on('sendclaimsadmin', function (data) {
         console.log('============');
         console.log('io.sockets.on for sendclaimsadmin. data:', data);
@@ -420,13 +355,11 @@ module.exports = function (socket) {
         if (socket.handshake !== undefined && socket.handshake.session !== undefined) {
             var user = socket.handshake.session.user_id;
             if (data.ID == -1) {
-                console.log('insert============');
-
+               console.log('insert============');
             }
             else {
                 console.log('in up ', data)
-                database.execute('update PT_MPS  set  "QA Notes" = ? ,"State" = ? where PROJECT_ID = ?', [data.QA_Notes , data.State , data.ID], function (err, results) {
-
+                firebird.database().execute('update PT_MPS  set  "QA Notes" = ? ,"State" = ? where PROJECT_ID = ?', [data.QA_Notes , data.State , data.ID], function (err, results) {
                         output = {"result": 'update'}; // resultx
                         console.log('output.', output, err, results);
                         socket.emit('responseclaimsadmin', output);
@@ -434,9 +367,6 @@ module.exports = function (socket) {
                 )
 
             }
-
         }
     });
-
-
 };
