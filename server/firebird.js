@@ -1,6 +1,7 @@
 !
 /*
  * Serve content over a socket
+ Rerfactored databases json wrapping.
  */
 var FBconnect
     , _ = require('underscore')
