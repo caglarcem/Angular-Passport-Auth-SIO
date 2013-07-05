@@ -14,6 +14,7 @@ I've included all the code for those it might help.
 ## Notes:
 
 - [Firebird] (http://firebirdsql.org) (http://ibphoeninx.com) open source sql database and can easily be replaced by mysql.
+- [https://github.com/hgourvest/node-firebird] Henri Gourvest essential repo for using node with firebird
 - I use the database for local authentication (see \Server\Models\User.js)
 - socket.js uses the authenication credentials to bring only the data for logged in user. See \Server\socket.js and  Usage
 - I will refactor this code asap to make it more efficient
