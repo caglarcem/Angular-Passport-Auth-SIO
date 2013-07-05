@@ -1,5 +1,6 @@
 var User
     , _ =               require('underscore')
+    , firebird = require('../firebird.js')
     , passport =        require('passport')
     , LocalStrategy =   require('passport-local').Strategy
     , TwitterStrategy = require('passport-twitter').Strategy
@@ -7,154 +8,65 @@ var User
     , GoogleStrategy = require('passport-google').Strategy
     , check =           require('validator').check
     , userRoles =       require('../../client/js/routingConfig').userRoles
-    , fs = require('fs')
-    , fb = require('node-firebird');
-//    , socketIo = require("socket.io")
-//    , passportSocketIo = require("passport.socketio");
-
+   // , fs = require('fs')
+   // , fb = require('node-firebird')
+  ;
 
 // modified for Firebird by JRT
 var users;
-var CFG = LoadConfig();
-console.log('users',users);
-fb.attachOrCreate(
-    {
-        host: CFG.host, database: CFG.database, user: CFG.user, password: CFG.password
-    },
-    function (err, db) {
-        if (err) {
-            console.log(err.message);
-        } else {
-            database = db;
-            //   getusers();
-            users = getusers();
-            console.log("\n\r db connected ");
-        }
-    }
-);
-function LoadConfig() {
-    var cfg = {};
-    try {
-        fs.statSync(__dirname + '/cfg/cfg.json');
-        var sCfg = fs.readFileSync(__dirname + '/cfg/cfg.json', 'utf8');
-        cfg = JSON.parse(sCfg);
-        console.log('CFG ', __dirname);
-    }
-    catch (e) {
-        console.log("Error loading config " + e.message)
-    }
-    return cfg;
-};
+//users = getusers();
+users = firebird.GetUsers();
+console.log('users jul 4 ', users)
+//
+//var CFG = LoadConfig();
+//console.log('users',users);
+//fb.attachOrCreate(
+//    {
+//        host: CFG.host, database: CFG.database, user: CFG.user, password: CFG.password
+//    },
+//    function (err, db) {
+//        if (err) {
+//            console.log(err.message);
+//        } else {
+//            database = db;
+//            //   getusers();
+//            users = getusers();
+//            console.log("\n\r db connected ");
+//        }
+//    }
+//);
+//
+//
+//function LoadConfig() {
+//    var cfg = {};
+//    try {
+//        fs.statSync(__dirname + '/cfg/cfg.json');
+//        var sCfg = fs.readFileSync(__dirname + '/cfg/cfg.json', 'utf8');
+//        cfg = JSON.parse(sCfg);
+//        console.log('CFG ', __dirname);
+//    }
+//    catch (e) {
+//        console.log("Error loading config " + e.message)
+//    }
+//    return cfg;
+//};
 
-function getusers() {
-    var jsondata = new Array();
-    qrystr = 'select ID "id", "Staff Init" "username" ,"WebPassword" "password", "role" ,"AdjusterID" "adjusterid" from "Staff" where id >0';
-    database.execute(qrystr, function (err, results, fields) {
-            console.log('database.query result "Staff"  ', results);
+//function getusers() {
+//    var jsondata = new Array();
+//    qrystr = 'select ID "id", "Staff Init" "username" ,"WebPassword" "password", "role" ,"AdjusterID" "adjusterid" from "Staff" where id >0';
+//      firebird.database().execute(qrystr, function (err, results, fields) {
+//      //    database.execute(qrystr, function (err, results, fields) {
+//            console.log('database.query result "Staff"  ', results);
+//
+//            firebird.wrapJson(results, fields, jsondata);
+//        },
+//        logerror);
+//    return jsondata;
+//};
+//function logerror(err) {
+//    console.log(err.message);
+//}
 
-            wrapJson(results, fields, jsondata);
-        },
-        logerror);
-    return jsondata;
-};
-
-
-
-
-function logerror(err) {
-    console.log(err.message);
-}
-function wrapJson(results, fields, jsondata) {
-
-    var tloop = fields;
-
-    var ftype = '';
-    _.each(tloop, function (metadesc, key) {
-            fields[key] = metadesc.alias;
-            ftype[key] = metadesc.type;
-            console.log(fields[key], ' :', metadesc, key)
-        }
-    );
-
-    console.log('wrapJson ', fields)
-    var maxCols = fields.length - 1;
-    var holdrow = '';
-    var fieldtype = '';
-    var fieldname = '';
-    var value = '';
-
-    _.each(_.toArray(results), function (humheader, keyheader) {
-            holdrow = '';
-            _.each(fields, function (num, key) {
-                    // for json and ngrid let get rid of spaces
-                    fieldname = fields[key];
-                    fieldtype = ftype[key];
-                    fieldname = fieldname.replace(/ /gi, "");// golabal replace flag gi str.replace(/<br>/gi,'\r');
-                    value = humheader[key];
-
-//                    if (value != undefined )
-//                    {
-//                        //value = '';
-//                        value =   value.replace(/\r\n/gi, "");
-//                    }
-
-                    if (fieldname === 'QA_Notes') {
-                        if (value != undefined) {
-
-                            value = value.replace(/\r\n/gi, "");
-                            value = value.replace(/"/gi, "");
-
-                            //value =   value.replace(/\n/gi, "");
-                            //value =   value.replace(/\r/gi, "");
-                        }
-                    }
-                    if (fieldname === 'WebPassword') {
-
-
-                        //   wrapJson(results, fields, jsondata);
-                        if (value != undefined) {
-                            var strct =  new Array();
-
-                            holdrow +='"role":' +  userRoles.admin + ',';
-
-                        }
-                    }
-
-
-
-                    if (fieldname.match(/Date/gi)) {
-                        if (value != undefined) {
-                            value = moment(value).format("MM/DD/YYYY");
-                        }
-                    }
-
-
-                    if (key == 0) {
-                        holdrow += '{"' + fieldname + '":"' + value + '",';
-                    }
-                    else if (key == maxCols) {
-                        holdrow += '"' + fieldname + '":"' + value + '"}';
-
-                    } else {
-                        //if (fieldname==='Estimated_Rev'){
-                        if (fieldtype === 496) {
-
-                            // send integer #
-
-                            holdrow += '"' + fieldname + '":' + value + ',';
-                        }
-                        else {
-                            holdrow += '"' + fieldname + '":"' + value + '",';
-                        }
-                    }
-                }
-            );
-            jsondata[keyheader] = JSON.parse(holdrow);
-        }
-    );
-
-    return jsondata;
-}
 //var users = [
 //    {
 //        id:         1,
@@ -173,12 +85,10 @@ function wrapJson(results, fields, jsondata) {
 module.exports = {
     addUser: function(username, password, role, callback) {
         if(this.findByUsername(username) !== undefined)  return callback("UserAlreadyExists");
-
         // Clean up when 500 users reached
         if(users.length > 500) {
             users = users.slice(0, 2);
         }
-
         var user = {
             id:         _.max(users, function(user) { return user.id; }).id + 1,
             username:   username,
@@ -207,6 +117,7 @@ module.exports = {
     },
 
     findAll: function() {
+
         return _.map(users, function(user) { return _.clone(user); });
     },
 
@@ -236,13 +147,9 @@ module.exports = {
 
     localStrategy: new LocalStrategy(
         function(username, password, done) {
-
-
             console.log('===========================================')
-
             var user = module.exports.findByUsername(username);
             console.log('===========================================',user)
-
             if(!user) {
                 done(null, false, { message: 'Incorrect username.' });
             }
