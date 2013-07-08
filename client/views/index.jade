@@ -1,31 +1,8 @@
 !!! 5
-html(lang='en', data-ng-app='angular-client-side-auth')
-    head
-        meta(charset='utf-8')
-        title Angular Auth Example
-        link(rel='stylesheet', href='css/appbase.css')
-        link(href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.no-icons.min.css", rel="stylesheet")
-        link(href="//netdna.bootstrapcdn.com/font-awesome/3.1.1/css/font-awesome.min.css", rel="stylesheet")
-        link(rel='stylesheet', href='css/bootstrap-combined.min.css')
-        link(rel='stylesheet', type='text/css', href='css/layout-default-latest.css')
-        link(rel='stylesheet', type='text/css', href='css/jquery-ui.css')
-        link(rel='stylesheet', type='text/css', href='css/angular-ui.css')
-        //link(rel='stylesheet', type='text/css', href='css/navigator.css')
-        link(rel='stylesheet', type='text/css', href='css/ng-grid.css')
-        link(rel='stylesheet', type='text/css', href='css/style.css')
-        link(rel='stylesheet', type='text/css', href='css/select2.css')
+extends layout
 
-        link(rel='stylesheet', type='text/css', href='css/ui-multicombo.css')
-        link(rel='stylesheet', type='text/css', href='css/appWiz.css')
-        link(rel='stylesheet', href='css/angular-table.css')
-
-
-// This is needed because Facebook login redirects add #_=_ at the end of the URL
-        script(type="text/javascript")
-            if (window.location.href.indexOf('#_=_') > 0) {
-                window.location = window.location.href.replace(/#.*/, '');
-            }
-    body(data-ng-controller="AppCtrl", data-ng-cloak)
+block body
+    body(ng-controller='AppCtrl', data-ng-cloak)
 
         #cover(data-ng-hide="appInitialized", data-ng-animate="{ hide: 'fade-hide' }")
 
@@ -98,10 +75,10 @@ html(lang='en', data-ng-app='angular-client-side-auth')
         script(src='/socket.io/socket.io.js')
         script(src='js/lib/transition.js')
 
-
-        script(src='js/lib/jsapi.js')
-        script(type='text/javascript')
-            google.load('visualization', '1.0', { 'packages': ['corechart'] });
+        // next 3 line for google charts
+        //script(src='js/lib/jsapi.js')
+        //script(type='text/javascript')
+        //    google.load('visualization', '1.0', { 'packages': ['corechart'] });
         script(src='js/lib/debounce.js')
         // make goople chart responsive
         script(src='js/lib/highcharts.js')
