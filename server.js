@@ -4,8 +4,8 @@ var express =       require('express.io')
     , path =        require('path')
     , User =        require('./server/models/User.js')
     , socket = require('./server/socket.js')
-    , passportSocketIo = require("passport.socketio")
-    , config = require('express-config');
+    , passportSocketIo = require("passport.socketio");
+    // , config = require('express-config');
 
 //**********************************************\\
 var app = express();
@@ -17,6 +17,11 @@ app.io.route('private', function(req) {
 
 app.set('views', __dirname + '/client/views');
 app.set('view engine', 'jade');
+app.set('view options', {
+    layout:false
+});
+
+
 app.use(express.logger('dev'))
 app.use(express.cookieParser());
 app.use(express.bodyParser());
