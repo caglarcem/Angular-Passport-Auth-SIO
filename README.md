@@ -12,6 +12,14 @@ Angular-Passport-Auth-SIO
 I've included all the code for those it might help.
 
 ## Notes:
+- To install in windows from command prompt
+md nodedemo
+cd nodedemo
+git clone https://github.com/johntom/Angular-Passport-Auth-SIO
+npm install
+node server
+install firebird and copy from adjuster.gdb from \database to wherever desired and change \Angular-Passport-Auth-SIO\server\models\cfg\cfg.json
+in browser http://localhost:8000
 
 - [Firebird] (http://firebirdsql.org) (http://ibphoeninx.com) open source sql database and can easily be replaced by mysql.
 - [https://github.com/hgourvest/node-firebird] Henri Gourvest essential repo for using node with firebird
