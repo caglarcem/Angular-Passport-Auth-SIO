@@ -109,10 +109,12 @@ var routes = [
         path: '/*',
         httpMethod: 'GET',
         middleware: [function(req, res) {
-            var role = userRoles.public, username = '';
+            var role = userRoles.public, username = '',adjusterid = '';
+            console.log('--req.user---------------------\n',req.user)
             if(req.user) {
                 role = req.user.role;
                 username = req.user.username;
+                adjusterid = req.user.adjusterid;
             }
             res.cookie('user', JSON.stringify({
                 'username': username,
