@@ -11,6 +11,9 @@ Angular-Passport-Auth-SIO
 ### This is a complete demonstration  of express.io,  passport, passport.socketio, firebird sql and angular.
 I've included all the code for those it might help.
 
+## Blog
+- http://johntomaselli.blogspot.com/2013/07/firebird-angularjs-node-and-socketio.html
+- 
 ## Notes:
 - To install in windows from command prompt
 - md nodedemo
