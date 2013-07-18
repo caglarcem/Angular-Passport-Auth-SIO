@@ -29,6 +29,9 @@ I've included all the code for those it might help.
 - I use the database for local authentication (see \Server\Models\User.js)
 - socket.js uses the authenication credentials to bring only the data for logged in user. See \Server\socket.js and  Usage
 - I will refactor this code asap to make it more efficient
+- 
+- After installing copy the ADJUSTER.GDB database to desired directory, make sure firebird service is running
+- and change path in the server\modes.  server / models / cfg / cfg.json
 
 Usage 
 =====
